@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: niryo_ned2_mock_moveit_config
+    relative_path: config/niryo_ned2_mock.urdf.xacro
+  srdf:
+    relative_path: config/niryo_ned2_mock.srdf
+  package_settings:
+    author_name: Niryo Development
+    author_email: dev@niryo.com
+    generated_timestamp: 1750324424
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
