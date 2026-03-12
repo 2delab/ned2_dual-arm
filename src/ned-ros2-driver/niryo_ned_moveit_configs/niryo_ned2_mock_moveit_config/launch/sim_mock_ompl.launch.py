@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 
 import os
+from pathlib import Path
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import (
+    DeclareLaunchArgument,
+    IncludeLaunchDescription,
+    ExecuteProcess,
+)
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 from moveit_configs_utils import MoveItConfigsBuilder
+from ament_index_python.packages import get_package_share_directory
 
 
 def generate_launch_description():
@@ -42,6 +48,16 @@ def generate_launch_description():
     rviz_config_arg = DeclareLaunchArgument("rviz_config", default_value="moveit.rviz")
     publish_frequency_arg = DeclareLaunchArgument(
         "publish_frequency", default_value="15.0"
+    )
+    load_scene_arg = DeclareLaunchArgument(
+        "load_scene",
+        default_value="true",
+        description="Load workspace planning scene on startup",
+    )
+    load_scene_arg = DeclareLaunchArgument(
+        "load_scene",
+        default_value="true",
+        description="Load workspace planning scene on startup",
     )
 
     # MoveIt configuration - for single-arm mock simulation
@@ -106,6 +122,14 @@ def generate_launch_description():
                 "publish_transforms_updates": True,
                 # Force OMPL planner instead of default CHOMP
                 "default_planning_pipeline": "ompl",
+                # Load workspace planning scene on startup
+                "default_planning_scene": PathJoinSubstitution(
+                    [
+                        FindPackageShare("niryo_ned2_mock_moveit_config"),
+                        "config",
+                        "workspace_scene.yaml",
+                    ]
+                ),
             },
         ],
     )
@@ -133,6 +157,43 @@ def generate_launch_description():
         condition=IfCondition(LaunchConfiguration("use_rviz")),
     )
 
+    # Workspace scene loader (optional) - loads planning scene from YAML file
+    # Uses MoveIt's PlanningSceneInterface to add collision objects
+    # The script is installed to: <install>/lib/<package>/load_workspace_scene.py
+    # The share dir is at: <install>/share/<package>/
+    # So we need to go up one level from share and then into lib
+    pkg_share_dir = get_package_share_directory("niryo_ned2_mock_moveit_config")
+    install_dir = str(
+        Path(pkg_share_dir).parent.parent
+    )  # Go up: share/pkg -> . -> install
+    scene_script = os.path.join(
+        install_dir, "lib", "niryo_ned2_mock_moveit_config", "load_workspace_scene.py"
+    )
+
+    load_scene_node = ExecuteProcess(
+        cmd=["python3", scene_script],
+        output="screen",
+        condition=IfCondition(LaunchConfiguration("load_scene")),
+    )
+
+    load_scene_node = ExecuteProcess(
+        cmd=[
+            "python3",
+            scene_script,
+        ],
+        output="screen",
+        condition=IfCondition(LaunchConfiguration("load_scene")),
+    )
+
+    load_scene_node = ExecuteProcess(
+        cmd=[
+            "python3",
+            scene_script,
+        ],
+        output="screen",
+        condition=IfCondition(LaunchConfiguration("load_scene")),
+    )
+
     # Warehouse database (optional) - stores motion planning history
     warehouse_db_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -153,11 +214,13 @@ def generate_launch_description():
             use_rviz_arg,
             rviz_config_arg,
             publish_frequency_arg,
+            load_scene_arg,
             robot_state_publisher_node,
             ros2_control_node,
             joint_state_broadcaster_spawner,
             arm_controller_spawner,
             move_group_node,
+            load_scene_node,
             rviz_node,
             warehouse_db_launch,
         ]
