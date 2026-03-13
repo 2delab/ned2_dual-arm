@@ -46,6 +46,7 @@ class ArucoPosePublisher(Node):
         self.declare_parameter("frame_height", 480)
         self.declare_parameter("enable_visualization", True)
         self.declare_parameter("publish_image", False)
+        self.declare_parameter("camera_frame_id", "camera_1")
 
         # Get parameters
         self.camera_id = self.get_parameter("camera_id").value
@@ -55,6 +56,7 @@ class ArucoPosePublisher(Node):
         self.frame_height = self.get_parameter("frame_height").value
         self.enable_viz = self.get_parameter("enable_visualization").value
         self.publish_image = self.get_parameter("publish_image").value
+        self.camera_frame_id = self.get_parameter("camera_frame_id").value
 
         # Initialize camera
         self.cap = None
@@ -69,6 +71,10 @@ class ArucoPosePublisher(Node):
         # Control flags
         self.running = True
         self.processing_lock = threading.Lock()
+
+        # Marker reference tracking
+        self.marker_40_reference = None  # Current frame reference for marker ID 40
+        self.last_known_reference_40 = None  # Last known reference if 40 not detected
 
         # Create timer for camera capture at specified rate
         self.frame_count = 0
@@ -110,9 +116,9 @@ class ArucoPosePublisher(Node):
     def _init_detector(self) -> None:
         """Initialize ArUco detector."""
         try:
-            aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
-            params = cv2.aruco.DetectorParameters()
-            self.detector = cv2.aruco.ArucoDetector(aruco_dict, params)
+            # Use old OpenCV 4.5.x API
+            self.aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_250)
+            self.detector_params = cv2.aruco.DetectorParameters_create()
             self.get_logger().info("ArUco detector initialized")
         except Exception as e:
             self.get_logger().error(f"Failed to initialize detector: {e}")
@@ -167,7 +173,7 @@ class ArucoPosePublisher(Node):
 
             # Create ROS Image message with current timestamp
             ros_image = self.cv_bridge.cv2_to_imgmsg(frame, encoding="bgr8")
-            ros_image.header.frame_id = "camera"
+            ros_image.header.frame_id = self.camera_frame_id
 
             # Process frame (detect markers and publish transforms)
             marked_frame = self._process_frame(frame, ros_image)
@@ -203,8 +209,10 @@ class ArucoPosePublisher(Node):
                 # Convert to grayscale for detection
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-                # Detect markers
-                corners, ids, rejected = self.detector.detectMarkers(gray)
+                # Detect markers (using old OpenCV 4.5.x API)
+                corners, ids, rejected = cv2.aruco.detectMarkers(
+                    gray, self.aruco_dict, parameters=self.detector_params
+                )
 
                 # Draw detected markers
                 marked_frame = cv2.aruco.drawDetectedMarkers(marked_frame, corners, ids)
@@ -226,7 +234,7 @@ class ArucoPosePublisher(Node):
         self, frame: np.ndarray, ros_msg: Image, corners: list, ids: np.ndarray
     ) -> None:
         """
-        Process detected ArUco markers and publish transforms.
+        Process detected ArUco markers and publish transforms relative to marker ID 40 reference.
 
         Args:
             frame: OpenCV image frame
@@ -240,6 +248,18 @@ class ArucoPosePublisher(Node):
                 corners, self.marker_size, self.camera_matrix, self.dist_coeffs
             )
 
+            # First pass: find and update reference marker (ID 40)
+            for i, marker_id in enumerate(ids.flatten()):
+                if marker_id == 40:
+                    self.marker_40_reference = tvecs[i][0].copy()
+                    self.last_known_reference_40 = self.marker_40_reference.copy()
+                    self.get_logger().debug(
+                        f"[{self.camera_frame_id}] Updated reference marker 40 at: "
+                        f"({self.marker_40_reference[0]:.3f}, {self.marker_40_reference[1]:.3f}, {self.marker_40_reference[2]:.3f})"
+                    )
+                    break
+
+            # Second pass: publish all markers relative to reference
             for i, marker_id in enumerate(ids.flatten()):
                 rvec = rvecs[i][0]
                 tvec = tvecs[i][0]
@@ -247,7 +267,7 @@ class ArucoPosePublisher(Node):
                 # Calculate distance
                 distance = np.linalg.norm(tvec)
 
-                # Publish TF transform
+                # Publish TF transform (relative to reference)
                 self._publish_transform(ros_msg, marker_id, rvec, tvec)
 
                 # Draw visualization
@@ -262,7 +282,7 @@ class ArucoPosePublisher(Node):
         self, ros_msg: Image, marker_id: int, rvec: np.ndarray, tvec: np.ndarray
     ) -> None:
         """
-        Publish marker pose as TF transform.
+        Publish marker pose as TF transform relative to marker ID 40 reference frame.
 
         Args:
             ros_msg: ROS Image message (for timestamp)
@@ -270,22 +290,37 @@ class ArucoPosePublisher(Node):
             rvec: Rotation vector
             tvec: Translation vector
         """
+        # Only use current reference (not last known) - stop publishing if 40 not detected
+        if self.marker_40_reference is None:
+            self.get_logger().debug(
+                f"[{self.camera_frame_id}] Cannot publish marker {marker_id}: "
+                f"Reference marker 40 not yet detected this frame"
+            )
+            return
+
+        # Skip publishing marker 40 itself - it's handled by static TF at world (0, 0, 0)
+        if marker_id == 40:
+            return
+
+        # Calculate offset from reference marker 40
+        offset_tvec = tvec - self.marker_40_reference
+
+        # Create transform relative to aruco_marker_40 frame
         transform = TransformStamped()
         transform.header.stamp = self.get_clock().now().to_msg()
-        transform.header.frame_id = "mono_camera"
-        transform.child_frame_id = f"mono_aruco_marker_{int(marker_id)}"
+        transform.header.frame_id = "aruco_marker_40"
+        transform.child_frame_id = f"aruco_marker_{int(marker_id)}"
 
-        # Set translation
-        transform.transform.translation.x = float(tvec[0])
-        transform.transform.translation.y = float(tvec[1])
-        transform.transform.translation.z = float(tvec[2])
+        # Set translation as offset from marker 40 (Z fixed to 0)
+        transform.transform.translation.x = float(offset_tvec[0])
+        transform.transform.translation.y = float(offset_tvec[1])
+        transform.transform.translation.z = 0.0
 
-        # Convert rotation vector to quaternion
-        quat = self._rvec_to_quat(rvec)
-        transform.transform.rotation.x = float(quat[0])
-        transform.transform.rotation.y = float(quat[1])
-        transform.transform.rotation.z = float(quat[2])
-        transform.transform.rotation.w = float(quat[3])
+        # Use identity rotation (markers are flat on ground)
+        transform.transform.rotation.x = 0.0
+        transform.transform.rotation.y = 0.0
+        transform.transform.rotation.z = 0.0
+        transform.transform.rotation.w = 1.0
 
         self.tf_broadcaster.sendTransform(transform)
 

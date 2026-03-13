@@ -3,11 +3,10 @@ project(niryo_ned2_dual_arm_moveit_config)
 
 find_package(ament_cmake REQUIRED)
 
-# Install Python executables
-# joint_state_prefixer.py: bridges unprefixed driver joint states to prefixed names expected by the URDF
-# load_workspace_scene.py: loads planning scene from YAML file
+# Install Python executable for joint state prefixer
+# This node bridges unprefixed driver joint states to prefixed names expected by the URDF
 install(
-  PROGRAMS src/joint_state_prefixer.py src/load_workspace_scene.py
+  PROGRAMS src/joint_state_prefixer.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

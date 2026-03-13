@@ -6,7 +6,7 @@ import time
 chessboard_size = (9, 6)
 square_size = 25.0
 max_frames = 20
-CAMERA_INDEX = 0  # Change this if your camera is not index 0 (e.g., 1, 2)
+CAMERA_INDEX = 1  # Change this if your camera is not index 0 (e.g., 1, 2)
 
 # === Prepare object points ===
 objp = np.zeros((chessboard_size[0] * chessboard_size[1], 3), np.float32)
