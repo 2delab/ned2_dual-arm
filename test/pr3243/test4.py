@@ -168,13 +168,13 @@ def main():
     print("Execution: Sequential (arm_1 first, then arm_2)")
 
     # Move arm_1 joint_1 to 50 degrees
-    result1 = send_single_arm_goal(action_client, node, "arm_1", "arm_1_joint_1", 50)
+    result1 = send_single_arm_goal(action_client, node, "arm_1", "arm_1_joint_1", 0)
 
     # Small delay between movements
     time.sleep(1.0)
 
     # Move arm_2 joint_1 to 50 degrees
-    result2 = send_single_arm_goal(action_client, node, "arm_2", "arm_2_joint_1", 50)
+    result2 = send_single_arm_goal(action_client, node, "arm_2", "arm_2_joint_1", 0)
 
     # Summary
     print("\n" + "=" * 70)

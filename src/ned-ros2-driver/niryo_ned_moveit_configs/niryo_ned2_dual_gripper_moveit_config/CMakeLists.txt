@@ -3,6 +3,13 @@ project(niryo_ned2_dual_gripper_moveit_config)
 
 find_package(ament_cmake REQUIRED)
 
+# Install Python executable for joint state prefixer
+# This node bridges unprefixed driver joint states to prefixed names expected by the URDF
+install(
+  PROGRAMS src/joint_state_prefixer.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/launch")

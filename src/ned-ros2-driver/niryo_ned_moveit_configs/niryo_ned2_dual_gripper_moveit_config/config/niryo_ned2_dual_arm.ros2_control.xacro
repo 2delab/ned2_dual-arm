@@ -92,18 +92,6 @@
                   <param name="initial_value">${initial_positions['arm_1_joint_base_to_mors_2']}</param>
                 </state_interface>
             </joint>
-            <joint name="arm_2_joint_base_to_mors_1">
-                <command_interface name="position"/>
-                <state_interface name="position">
-                  <param name="initial_value">${initial_positions['arm_2_joint_base_to_mors_1']}</param>
-                </state_interface>
-            </joint>
-            <joint name="arm_2_joint_base_to_mors_2">
-                <command_interface name="position"/>
-                <state_interface name="position">
-                  <param name="initial_value">${initial_positions['arm_2_joint_base_to_mors_2']}</param>
-                </state_interface>
-            </joint>
 
         </ros2_control>
     </xacro:macro>

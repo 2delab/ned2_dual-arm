@@ -27,21 +27,12 @@
         <joint name="arm_2_joint_5"/>
         <joint name="arm_2_joint_6"/>
     </group>
-    <group name="gripper_1">
-        <joint name="arm_1_joint_base_to_mors_1"/>
-        <joint name="arm_1_joint_base_to_mors_2"/>
-    </group>
-    <group name="gripper_2">
-        <joint name="arm_2_joint_base_to_mors_1"/>
-        <joint name="arm_2_joint_base_to_mors_2"/>
-    </group>
     <group name="dual">
         <group name="arm_1"/>
         <group name="arm_2"/>
     </group>
-    <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
-    <end_effector name="gripper_1" parent_link="arm_1_hand_link" group="gripper_1" parent_group="arm_1"/>
-    <end_effector name="gripper_2" parent_link="arm_2_hand_link" group="gripper_2" parent_group="arm_2"/>
+ 
+   
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="arm_1_arm_link" link2="arm_1_base_link" reason="Never"/>
     <disable_collisions link1="arm_1_arm_link" link2="arm_1_camera_link" reason="Never"/>
