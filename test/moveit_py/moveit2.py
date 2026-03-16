@@ -32,17 +32,20 @@ pose_goal.pose.position.x = 0.3
 pose_goal.pose.position.y = 0.0
 pose_goal.pose.position.z = 0.2
 
-# Convert RPY to quaternion (roll=0.0, pitch=1.56, yaw=0.0)
-pitch = 1.56
-qx = math.sin(pitch / 2)
-qy = 0.0
+
+# X-axis facing DOWN (pointing toward ground)
+qx = 0.0
+qy = 0.7071
 qz = 0.0
-qw = math.cos(pitch / 2)
+qw = 0.7071
+
+
 pose_goal.pose.orientation.x = qx
 pose_goal.pose.orientation.y = qy
 pose_goal.pose.orientation.z = qz
 pose_goal.pose.orientation.w = qw
 
+# Result: quaternion (0.7071, 0, 0, 0.7071)
 # Set goal state with pose
 arm_1.set_goal_state(pose_stamped_msg=pose_goal, pose_link="arm_1_tool_link")
 
