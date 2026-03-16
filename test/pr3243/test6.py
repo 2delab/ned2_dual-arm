@@ -40,7 +40,7 @@ def send_phase_goal(
     goal.request.group_name = "dual"
     goal.request.num_planning_attempts = 10
     goal.request.allowed_planning_time = 5.0
-    goal.request.max_velocity_scaling_factor = 0.3
+    goal.request.max_velocity_scaling_factor = 0.1
     goal.request.pipeline_id = "ompl"
     goal.request.planner_id = "RRTConnect"
 

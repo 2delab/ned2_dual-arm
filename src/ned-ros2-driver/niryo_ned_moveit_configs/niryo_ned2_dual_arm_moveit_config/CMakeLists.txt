@@ -10,6 +10,11 @@ install(
   DESTINATION lib/${PROJECT_NAME}
 )
 
+install(
+  PROGRAMS src/load_workspace_scene.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 # Install ros2_controllers configuration
 # This is loaded by the controller_manager node for hardware control
 install(FILES config/ros2_controllers.yaml DESTINATION share/${PROJECT_NAME}/config)

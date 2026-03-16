@@ -69,8 +69,23 @@
         <joint name="arm_2_joint_4" value="0"/>
         <joint name="arm_2_joint_5" value="0"/>
         <joint name="arm_2_joint_6" value="0"/>
-    </group_state>
-    <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
+     </group_state>
+     <!--LINK PADDING: Add safety margin (padding) around robot links for collision checking. This ensures minimum distance between arms during planning and execution. Padding of 0.05m per link = 0.10m (10cm) total gap between arms.-->
+     <link_padding link="arm_1_base_link" padding="0.05"/>
+     <link_padding link="arm_1_shoulder_link" padding="0.05"/>
+     <link_padding link="arm_1_arm_link" padding="0.05"/>
+     <link_padding link="arm_1_elbow_link" padding="0.05"/>
+     <link_padding link="arm_1_forearm_link" padding="0.05"/>
+     <link_padding link="arm_1_wrist_link" padding="0.05"/>
+     <link_padding link="arm_1_hand_link" padding="0.05"/>
+     <link_padding link="arm_2_base_link" padding="0.05"/>
+     <link_padding link="arm_2_shoulder_link" padding="0.05"/>
+     <link_padding link="arm_2_arm_link" padding="0.05"/>
+     <link_padding link="arm_2_elbow_link" padding="0.05"/>
+     <link_padding link="arm_2_forearm_link" padding="0.05"/>
+     <link_padding link="arm_2_wrist_link" padding="0.05"/>
+     <link_padding link="arm_2_hand_link" padding="0.05"/>
+     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="arm_1_arm_link" link2="arm_1_base_link" reason="Never"/>
     <disable_collisions link1="arm_1_arm_link" link2="arm_1_elbow_link" reason="Adjacent"/>
     <disable_collisions link1="arm_1_arm_link" link2="arm_1_hand_link" reason="Never"/>

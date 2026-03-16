@@ -319,7 +319,6 @@ def main(args=None):
     rclpy.init(args=args)
     node = JointStatePrefixer()
 
-    # Use MultiThreadedExecutor with enough threads
     # 2 joint state subs + 1 timer + 2 action servers + buffer
     executor = MultiThreadedExecutor(num_threads=8)
     executor.add_node(node)

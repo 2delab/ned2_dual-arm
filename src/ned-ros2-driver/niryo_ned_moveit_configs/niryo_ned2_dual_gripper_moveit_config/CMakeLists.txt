@@ -10,6 +10,11 @@ install(
   DESTINATION lib/${PROJECT_NAME}
 )
 
+install(
+  PROGRAMS src/load_workspace_scene.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/launch")

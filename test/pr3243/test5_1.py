@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-MoveIt2 Dual-Arm Control with Joint Constraints (Simultaneous)
-Moves both arm_1_joint_1 and arm_2_joint_1 to 50 degrees simultaneously.
-All other joints are locked at current positions for predictable motion.
+MoveIt2 Dual-Arm Control with Custom Joint Angles
+Usage: python test5_1.py [a1j1] [a1j2] [a1j3] [a1j4] [a1j5] [a1j6] [a2j1] [a2j2] [a2j3] [a2j4] [a2j5] [a2j6]
+Example: python test5_1.py 30 0 0 0 0 0 45 0 0 0 0 0
 """
 
+import sys
 import rclpy
 from rclpy.action import ActionClient
 from moveit_msgs.action import MoveGroup
@@ -13,8 +14,24 @@ from math import radians
 
 
 def main():
+    # Parse arguments
+    angles = [0.0] * 12
+    if len(sys.argv) > 1:
+        if sys.argv[1] in ["-h", "--help"]:
+            print(__doc__)
+            return True
+        try:
+            angles = [
+                float(sys.argv[i + 1]) if i + 1 < len(sys.argv) else 0.0
+                for i in range(12)
+            ]
+        except ValueError:
+            print("Error: All angles must be numeric (in degrees)")
+            print(__doc__)
+            return False
+
     rclpy.init()
-    node = rclpy.create_node("moveit_test_dual_arm")
+    node = rclpy.create_node("moveit_test_dual_arm_custom")
     action_client = ActionClient(node, MoveGroup, "/move_action")
 
     print("\nWaiting for move_group action server...")
@@ -25,7 +42,7 @@ def main():
 
     print("✓ Connected to move_group action server\n")
 
-    # Create goal request
+    # Create goal
     goal = MoveGroup.Goal()
     goal.request = MotionPlanRequest()
     goal.request.group_name = "dual"
@@ -36,60 +53,28 @@ def main():
     goal.request.pipeline_id = "ompl"
     goal.request.planner_id = "RRTConnect"
 
-    # Build constraint list: move only joint_1 on each arm, lock all others
+    # Build constraints from angles
     constraints_list = []
+    arm_names = ["arm_1", "arm_2"]
 
-    # Arm 1 constraints
-    for i in range(1, 7):
-        constraint = JointConstraint()
-        constraint.joint_name = f"arm_1_joint_{i}"
-        constraint.weight = 1.0
-
-        if i == 1:
-            # Joint 1: move to 50 degrees
-            constraint.position = radians(50)
+    for arm_idx, arm_name in enumerate(arm_names):
+        for joint_idx in range(1, 7):
+            constraint = JointConstraint()
+            constraint.joint_name = f"{arm_name}_joint_{joint_idx}"
+            constraint.weight = 1.0
+            constraint.position = radians(angles[arm_idx * 6 + joint_idx - 1])
             constraint.tolerance_above = radians(5)
             constraint.tolerance_below = radians(5)
-        else:
-            # Other joints: lock at current position (0.0)
-            constraint.position = 0.0
-            constraint.tolerance_above = radians(1)  # Very tight
-            constraint.tolerance_below = radians(1)  # Lock in place
-
-        constraints_list.append(constraint)
-
-    # Arm 2 constraints
-    for i in range(1, 7):
-        constraint = JointConstraint()
-        constraint.joint_name = f"arm_2_joint_{i}"
-        constraint.weight = 1.0
-
-        if i == 1:
-            # Joint 1: move to 50 degrees
-            constraint.position = radians(50)
-            constraint.tolerance_above = radians(5)
-            constraint.tolerance_below = radians(5)
-        else:
-            # Other joints: lock at current position (0.0)
-            constraint.position = 0.0
-            constraint.tolerance_above = radians(1)  # Very tight
-            constraint.tolerance_below = radians(1)  # Lock in place
-
-        constraints_list.append(constraint)
+            constraints_list.append(constraint)
 
     goal.request.goal_constraints.append(
         Constraints(joint_constraints=constraints_list)
     )
 
-    print("Planning dual-arm motion to 50° on both joint_1...")
-    print(f"  Group: {goal.request.group_name}")
-    print(f"  Planner: {goal.request.planner_id}")
-    print(f"  Max velocity: {goal.request.max_velocity_scaling_factor}")
-    print(f"  Motion: SIMULTANEOUS (both arms move at same time)")
-    print(f"  Constraints: 12 joints total")
-    print(f"    - arm_1_joint_1 & arm_2_joint_1 → move to 50°")
-    print(f"    - all other joints (2-6 on each arm) → locked at 0°")
-    print()
+    # Print target angles
+    print(f"Target angles (degrees):")
+    print(f"  Arm 1: {angles[0:6]}")
+    print(f"  Arm 2: {angles[6:12]}\n")
 
     # Send goal
     future = action_client.send_goal_async(goal)
@@ -117,7 +102,6 @@ def main():
 
     if error_code == 1:  # SUCCESS
         print("✓ SUCCESS!")
-        print("Both arms moved to 50° on joint_1")
         rclpy.shutdown()
         return True
     else:
