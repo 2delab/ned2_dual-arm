@@ -28,8 +28,8 @@ arm_1.set_start_state_to_current_state()
 # Create pose goal
 pose_goal = PoseStamped()
 pose_goal.header.frame_id = "arm_1_base_link"
-pose_goal.pose.position.x = 0.3
-pose_goal.pose.position.y = 0.0
+pose_goal.pose.position.x = 0.30
+pose_goal.pose.position.y = -0.2
 pose_goal.pose.position.z = 0.2
 
 

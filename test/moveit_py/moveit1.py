@@ -11,7 +11,7 @@ rclpy.init()
 
 # Load config file
 config_file = os.path.join(
-    get_package_share_directory("niryo_ned2_dual_arm_moveit_config"),
+    get_package_share_directory("niryo_ned2_dual_gripper_moveit_config"),
     "config",
     "moveit_py_params.yaml",
 )

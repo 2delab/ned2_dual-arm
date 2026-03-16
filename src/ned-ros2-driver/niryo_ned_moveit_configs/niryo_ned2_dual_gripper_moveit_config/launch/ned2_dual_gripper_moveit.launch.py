@@ -98,7 +98,12 @@ def generate_launch_description():
         package="moveit_ros_move_group",
         executable="move_group",
         output="screen",
-        parameters=[moveit_config.to_dict()],
+        parameters=[
+            moveit_config.to_dict(),
+            {
+                "publish_robot_description_semantic": True,
+            },
+        ],
         arguments=["--ros-args", "--log-level", "info"],
     )
 
