@@ -56,9 +56,7 @@ def generate_launch_description():
         .robot_description_semantic(file_path="config/niryo_ned2_dual.srdf")
         .robot_description_kinematics(file_path="config/kinematics.yaml")
         .trajectory_execution(file_path="config/moveit_controllers.yaml")
-        .planning_pipelines(
-            pipelines=["ompl", "chomp", "pilz_industrial_motion_planner"]
-        )
+        .planning_pipelines(pipelines=["ompl"])
         .to_moveit_configs()
     )
 
@@ -98,7 +96,12 @@ def generate_launch_description():
         package="moveit_ros_move_group",
         executable="move_group",
         output="screen",
-        parameters=[moveit_config.to_dict()],
+        parameters=[
+            moveit_config.to_dict(),
+            {
+                "publish_robot_description_semantic": True,
+            },
+        ],
         arguments=["--ros-args", "--log-level", "info"],
     )
 

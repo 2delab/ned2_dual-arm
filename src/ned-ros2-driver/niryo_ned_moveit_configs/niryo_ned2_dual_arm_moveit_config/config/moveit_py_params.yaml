@@ -1,0 +1,139 @@
+/**:
+  ros__parameters:
+    planning_scene_monitor_options:
+      name: "planning_scene_monitor"
+      robot_description: "robot_description"
+      robot_description_semantic: "robot_description_semantic"
+      joint_state_topic: "/joint_states"
+      attached_collision_object_topic: "/moveit_py/planning_scene_monitor"
+      publish_planning_scene_topic: "/moveit_py/publish_planning_scene"
+      monitored_planning_scene_topic: "/moveit_py/monitored_planning_scene"
+      wait_for_initial_state_timeout: 15.0
+
+    planning_pipelines:
+      pipeline_names: ["ompl"]
+      default_planning_pipeline: "ompl"
+
+    plan_request_params:
+      planning_attempts: 1
+      planning_pipeline: ompl
+      max_velocity_scaling_factor: 1.0
+      max_acceleration_scaling_factor: 1.0
+
+    ompl:
+      planning_plugins:
+        - ompl_interface/OMPLPlanner
+      request_adapters:
+        - default_planning_request_adapters/ResolveConstraintFrames
+        - default_planning_request_adapters/ValidateWorkspaceBounds
+        - default_planning_request_adapters/CheckStartStateBounds
+        - default_planning_request_adapters/CheckStartStateCollision
+      response_adapters:
+        - default_planning_response_adapters/AddTimeOptimalParameterization
+        - default_planning_response_adapters/ValidateSolution
+        - default_planning_response_adapters/DisplayMotionPath
+      start_state_max_bounds_error: 0.1
+      jiggle_fraction: 0.05
+      max_goal_count: 10
+      longest_valid_segment_fraction: 0.005
+      plan_request_params:
+        planning_attempts: 1
+        planning_pipeline: ompl
+        planner_id: "RRTConnectkConfigDefault"
+        max_velocity_scaling_factor: 1.0
+        max_acceleration_scaling_factor: 1.0
+        planning_time: 1.0
+
+    robot_description_planning:
+      default_acceleration_scaling_factor: 0.3
+      default_velocity_scaling_factor: 0.3
+      joint_limits:
+        arm_1_joint_1:
+          has_velocity_limits: true
+          max_velocity: 1.57
+          has_acceleration_limits: true
+          max_acceleration: 2.0
+        arm_1_joint_2:
+          has_velocity_limits: true
+          max_velocity: 1.047
+          has_acceleration_limits: true
+          max_acceleration: 0.8
+        arm_1_joint_3:
+          has_velocity_limits: true
+          max_velocity: 1.57
+          has_acceleration_limits: true
+          max_acceleration: 2.0
+        arm_1_joint_4:
+          has_velocity_limits: true
+          max_velocity: 3.14
+          has_acceleration_limits: true
+          max_acceleration: 3.0
+        arm_1_joint_5:
+          has_velocity_limits: true
+          max_velocity: 3.14
+          has_acceleration_limits: true
+          max_acceleration: 3.0
+        arm_1_joint_6:
+          has_velocity_limits: true
+          max_velocity: 3.14
+          has_acceleration_limits: true
+          max_acceleration: 3.0
+        arm_2_joint_1:
+          has_velocity_limits: true
+          max_velocity: 1.57
+          has_acceleration_limits: true
+          max_acceleration: 2.0
+        arm_2_joint_2:
+          has_velocity_limits: true
+          max_velocity: 1.047
+          has_acceleration_limits: true
+          max_acceleration: 0.8
+        arm_2_joint_3:
+          has_velocity_limits: true
+          max_velocity: 1.57
+          has_acceleration_limits: true
+          max_acceleration: 2.0
+        arm_2_joint_4:
+          has_velocity_limits: true
+          max_velocity: 3.14
+          has_acceleration_limits: true
+          max_acceleration: 3.0
+        arm_2_joint_5:
+          has_velocity_limits: true
+          max_velocity: 3.14
+          has_acceleration_limits: true
+          max_acceleration: 3.0
+        arm_2_joint_6:
+          has_velocity_limits: true
+          max_velocity: 3.14
+          has_acceleration_limits: true
+          max_acceleration: 3.0
+
+    moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
+    
+    moveit_simple_controller_manager:
+      controller_names:
+        - arm_1
+        - arm_2
+      arm_1:
+        type: FollowJointTrajectory
+        joints:
+          - arm_1_joint_1
+          - arm_1_joint_2
+          - arm_1_joint_3
+          - arm_1_joint_4
+          - arm_1_joint_5
+          - arm_1_joint_6
+        action_ns: follow_joint_trajectory_prefixed
+        default: true
+      arm_2:
+        type: FollowJointTrajectory
+        joints:
+          - arm_2_joint_1
+          - arm_2_joint_2
+          - arm_2_joint_3
+          - arm_2_joint_4
+          - arm_2_joint_5
+          - arm_2_joint_6
+        action_ns: follow_joint_trajectory_prefixed
+        default: true
