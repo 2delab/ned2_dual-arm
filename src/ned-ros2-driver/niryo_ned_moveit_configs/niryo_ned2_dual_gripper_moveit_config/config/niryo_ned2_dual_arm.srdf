@@ -40,10 +40,10 @@
     <link_padding link="arm_1_forearm_link" padding="0.05"/>
     <link_padding link="arm_1_wrist_link" padding="0.05"/>
     <link_padding link="arm_1_hand_link" padding="0.05"/>
-    <link_padding link="arm_1_base_gripper_1" padding="0.05"/>
-    <link_padding link="arm_1_mors_1" padding="0.05"/>
-    <link_padding link="arm_1_mors_2" padding="0.05"/>
-    <link_padding link="arm_1_camera_link" padding="0.05"/>
+    <link_padding link="arm_1_base_gripper_1" padding="0.07"/>
+    <link_padding link="arm_1_mors_1" padding="0.07"/>
+    <link_padding link="arm_1_mors_2" padding="0.07"/>
+    <link_padding link="arm_1_camera_link" padding="0.07"/>
     <link_padding link="arm_2_base_link" padding="0.05"/>
     <link_padding link="arm_2_shoulder_link" padding="0.05"/>
     <link_padding link="arm_2_arm_link" padding="0.05"/>
@@ -51,10 +51,10 @@
     <link_padding link="arm_2_forearm_link" padding="0.05"/>
     <link_padding link="arm_2_wrist_link" padding="0.05"/>
     <link_padding link="arm_2_hand_link" padding="0.05"/>
-    <link_padding link="arm_2_base_gripper_1" padding="0.05"/>
-    <link_padding link="arm_2_mors_1" padding="0.05"/>
-    <link_padding link="arm_2_mors_2" padding="0.05"/>
-    <link_padding link="arm_2_camera_link" padding="0.05"/>
+    <link_padding link="arm_2_base_gripper_1" padding="0.07"/>
+    <link_padding link="arm_2_mors_1" padding="0.07"/>
+    <link_padding link="arm_2_mors_2" padding="0.07"/>
+    <link_padding link="arm_2_camera_link" padding="0.07"/>
    
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="arm_1_arm_link" link2="arm_1_base_link" reason="Never"/>
