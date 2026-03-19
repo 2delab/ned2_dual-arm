@@ -11,7 +11,7 @@ rclpy.init()
 
 # Load config file
 config_file = os.path.join(
-    get_package_share_directory("niryo_ned2_dual_arm_moveit_config"),
+    get_package_share_directory("niryo_ned2_dual_gripper_moveit_config"),
     "config",
     "moveit_py_params.yaml",
 )
@@ -28,8 +28,8 @@ arm_1.set_start_state_to_current_state()
 # Create pose goal
 pose_goal = PoseStamped()
 pose_goal.header.frame_id = "arm_1_base_link"
-pose_goal.pose.position.x = 0.30
-pose_goal.pose.position.y = -0.2
+pose_goal.pose.position.x = 0.2
+pose_goal.pose.position.y = 0.2
 pose_goal.pose.position.z = 0.2
 
 

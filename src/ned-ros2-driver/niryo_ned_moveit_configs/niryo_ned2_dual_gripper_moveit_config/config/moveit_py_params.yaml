@@ -57,6 +57,7 @@
     robot_description_planning:
       default_acceleration_scaling_factor: 0.3
       default_velocity_scaling_factor: 0.3
+      default_robot_padding: 0.1
       joint_limits:
         arm_1_joint_1:
           has_velocity_limits: true
@@ -125,6 +126,7 @@
       controller_names:
         - arm_1
         - arm_2
+        - dual
       arm_1:
         type: FollowJointTrajectory
         joints:
@@ -147,3 +149,21 @@
           - arm_2_joint_6
         action_ns: follow_joint_trajectory_prefixed
         default: true
+      dual:
+        type: FollowJointTrajectory
+        joints:
+          - arm_1_joint_1
+          - arm_1_joint_2
+          - arm_1_joint_3
+          - arm_1_joint_4
+          - arm_1_joint_5
+          - arm_1_joint_6
+          - arm_2_joint_1
+          - arm_2_joint_2
+          - arm_2_joint_3
+          - arm_2_joint_4
+          - arm_2_joint_5
+          - arm_2_joint_6
+        action_ns: follow_joint_trajectory_prefixed
+        default: true
+      

@@ -11,7 +11,7 @@ rclpy.init()
 
 # Load config file
 config_file = os.path.join(
-    get_package_share_directory("niryo_ned2_dual_arm_moveit_config"),
+    get_package_share_directory("niryo_ned2_dual_gripper_moveit_config"),
     "config",
     "moveit_py_params.yaml",
 )
@@ -30,7 +30,7 @@ target_radians = math.radians(50.0)
 # Plan and execute arm_1
 arm_1.set_start_state_to_current_state()
 robot_state_1 = RobotState(robot_model)
-robot_state_1.set_joint_group_positions("arm_1", [target_radians, 0, 0, 0, 0, 0])
+robot_state_1.set_joint_group_positions("arm_2", [target_radians, 0, 0, 0, 0, 0])
 arm_1.set_goal_state(robot_state=robot_state_1)
 
 plan_result_1 = arm_1.plan()
